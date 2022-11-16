@@ -1,0 +1,11 @@
+certifi==2022.9.24
+charset-normalizer==2.1.1
+future==0.16.0
+idna==3.4
+odoo-client-lib==1.2.0
+odoo-import-export-client==3.0.0
+pkg_resources==0.0.0
+requests==2.28.1
+six==1.15.0
+unicodecsv==0.14.1
+urllib3==1.26.12
