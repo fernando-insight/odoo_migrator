@@ -12,14 +12,17 @@ DEFAULT_BATCH_SIZE = 1000
 DEFAULT_WORKERS = int(os.environ.get('DEFAULT_WORKERS', 2))
 
 def import_data(model_name = None, file_csv = None, context = None, separator = None, ignore_fields = None, workers = None):
-    if not file_csv:
+    model_migration_config = models_migration_config[model_name]
+    if file_csv:
+        file_csv = f'{CSV_FILES_PATH}{file_csv}'
+    elif not file_csv:
         file_csv = f'{CSV_FILES_PATH}{model_name}.csv'
     if not context:
-        context = REQ_CONTEXT
+        context = model_migration_config.get('context', REQ_CONTEXT)
     if not separator:
-        separator = ','
+        separator = model_migration_config.get('separator', ',')
     if not ignore_fields:
-        ignore_fields = []
+        ignore_fields = model_migration_config.get('ignore_fields', [])
     if not workers:
         workers = DEFAULT_WORKERS
 
@@ -33,24 +36,21 @@ def import_data(model_name = None, file_csv = None, context = None, separator = 
                                 max_connection=workers,
     )
 
-for model_name in models_migration_config:
+def import_ignored_fields(model_name, file_csv = None):
     model_migration_config = models_migration_config[model_name]
-
-    context = model_migration_config.get('context')
-    separator = model_migration_config.get('separator')
     ignore_fields = model_migration_config.get('ignore_fields')
-
-    import_data(model_name,
-                context=context,
-                separator=separator,
-                ignore_fields=ignore_fields
-    )
-
     if ignore_fields:
         # import the ignored fields
-        added_fields = list(f for f in model_migration_config['fields'] if f not in ignore_fields and f not in ['id', 'name'])
-        import_data(model_name,
-                    context=context,
-                    separator=separator,
-                    ignore_fields=added_fields
-        )
+        added_fields = list(f for f in model_migration_config['fields'] if f not in ignore_fields and f not in ['id'])
+        import_data(model_name, ignore_fields=added_fields)
+
+for model_name in models_migration_config:
+    model_migration_config = models_migration_config[model_name]
+    if 'import_override_function' not in model_migration_config:
+        ignore_fields = model_migration_config.get('ignore_fields')
+        import_data(model_name)
+        if ignore_fields:
+            import_ignored_fields(model_name)
+    else:
+        # Call import_override_function instead of the standard export procedure
+        model_migration_config['import_override_function']()

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os
+import pandas
 
 from odoo_csv_tools import export_threaded
 from models_migration_config import models_migration_config
@@ -11,18 +12,21 @@ DEFAULT_BATCH_SIZE = 3000
 DEFAULT_WORKERS = int(os.environ.get('DEFAULT_WORKERS', 2))
 
 def export_data(model_name = None, domain = None, fields = None, output_file = None, workers = None, batch_size = None, context = None, separator = None):
+    model_migration_config = models_migration_config[model_name]
     if not domain:
-        domain = []
-    if not output_file:
+        domain = model_migration_config.get('domain', [])
+    if output_file:
+        output_file = f'{CSV_FILES_PATH}{output_file}'
+    elif not output_file:
         output_file = f'{CSV_FILES_PATH}{model_name}.csv'
     if not workers:
         workers = DEFAULT_WORKERS
     if not batch_size:
-        batch_size = DEFAULT_BATCH_SIZE
+        batch_size = model_migration_config.get('batch_size', DEFAULT_BATCH_SIZE)
     if not context:
-        context = DEFAULT_REQ_CONTEXT
+        context = model_migration_config.get('context', DEFAULT_REQ_CONTEXT)
     if not separator:
-        separator = ','
+        separator = model_migration_config.get('separator', ',')
 
     export_threaded.export_data(CONNECTION_CONFIG_DIR,
                                 model_name,
@@ -35,17 +39,10 @@ def export_data(model_name = None, domain = None, fields = None, output_file = N
                                 separator=separator,
     )
 
-
 for model_name in models_migration_config:
     model_migration_config = models_migration_config[model_name]
     if 'export_override_function' not in model_migration_config:
-        export_data(model_name=model_name,
-                    domain=model_migration_config.get('domain'),
-                    fields=model_migration_config['fields'],
-                    batch_size=model_migration_config.get('batch_size'),
-                    context=model_migration_config.get('context'),
-                    separator=model_migration_config.get('separator')
-        )
+        export_data(model_name=model_name)
         if 'export_extra_functions' in model_migration_config:
             # Call extra steps after exporting the csv file
             for extra_function in model_migration_config['export_extra_functions']:
