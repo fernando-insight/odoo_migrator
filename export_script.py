@@ -3,7 +3,7 @@ import os
 import pandas
 
 from odoo_csv_tools import export_threaded
-from models_migration_config import models_migration_config
+from models_migration_config import models_migration_config, partners_without_name_file_name
 
 CONNECTION_CONFIG_DIR = 'export_connection.conf'
 CSV_FILES_PATH = 'csv_files/'
@@ -15,6 +15,8 @@ def export_data(model_name = None, domain = None, fields = None, output_file = N
     model_migration_config = models_migration_config[model_name]
     if not domain:
         domain = model_migration_config.get('domain', [])
+    if not fields:
+        fields = model_migration_config.get('fields', [])
     if output_file:
         output_file = f'{CSV_FILES_PATH}{output_file}'
     elif not output_file:
@@ -38,6 +40,24 @@ def export_data(model_name = None, domain = None, fields = None, output_file = N
                                 context=context,
                                 separator=separator,
     )
+
+def export_extra_function_res_partner_no_names():
+    model_name = 'res.partner'
+    model_migration_config = models_migration_config[model_name]
+
+    fields_to_export = [f for f in model_migration_config['fields'] if f != 'name']
+    export_data(model_name=model_name,
+                domain=['|', ['name', '=', False], ['name', '=', '']],
+                fields=fields_to_export,
+                output_file=partners_without_name_file_name
+    )
+    partners_without_name_file_path = f'{CSV_FILES_PATH}{partners_without_name_file_name}'
+    partners_dataframe = pandas.read_csv(partners_without_name_file_path)
+    partners_dataframe.insert(len(fields_to_export), 'name','[N/A]')
+    partners_dataframe.to_csv(partners_without_name_file_path, index=False)
+
+models_migration_config['res.partner']['export_extra_functions'] = [export_extra_function_res_partner_no_names]
+
 
 for model_name in models_migration_config:
     model_migration_config = models_migration_config[model_name]
