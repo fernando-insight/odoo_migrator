@@ -3,7 +3,7 @@
 import os
 
 from odoo_csv_tools import import_threaded
-from models_migration_config import models_migration_config, partners_without_name_file_name
+from models_migration_config import models_migration_config, partners_without_name_file_name, res_users_groups_file_name
 
 CONNECTION_CONFIG_DIR = 'import_connection.conf'
 REQ_CONTEXT = {'tracking_disable' : True}
@@ -11,7 +11,7 @@ CSV_FILES_PATH = 'csv_files/'
 DEFAULT_WORKERS = int(os.environ.get('DEFAULT_WORKERS', 2))
 DEFAULT_BATCH_SIZE = 1000
 
-def import_data(model_name = None, file_csv = None, context = None, separator = None, ignore_fields = None, workers = None, batch_size = None):
+def import_data(model_name = None, file_csv = None, context = None, separator = None, ignore_fields = None, group_by = None, workers = None, batch_size = None):
     model_migration_config = models_migration_config[model_name]
     if file_csv:
         file_csv = f'{CSV_FILES_PATH}{file_csv}'
@@ -35,6 +35,7 @@ def import_data(model_name = None, file_csv = None, context = None, separator = 
                                 context=context,
                                 separator=separator,
                                 ignore=ignore_fields,
+                                split=group_by,
                                 max_connection=workers,
                                 batch_size=batch_size,
     )
@@ -60,6 +61,13 @@ def res_partner_import():
     import_ignored_fields(model_name, file_csv=partners_without_name_file_name, ignore_fields = ignore_fields, workers=1)
 
 models_migration_config['res.partner']['import_override_function'] = res_partner_import
+
+def res_users_import():
+    model_name = 'res.users'
+    import_data(model_name=model_name)
+    import_data(model_name=model_name, ignore_fields=['groups_id'], file_csv=res_users_groups_file_name, workers=1, batch_size=1, context={'update_many2many': True})
+
+models_migration_config['res.users']['import_override_function'] = res_users_import
 
 
 for model_name in models_migration_config:

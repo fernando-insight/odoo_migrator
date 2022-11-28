@@ -3,7 +3,7 @@ import os
 import pandas
 
 from odoo_csv_tools import export_threaded
-from models_migration_config import models_migration_config, partners_without_name_file_name
+from models_migration_config import models_migration_config, partners_without_name_file_name, res_users_groups_file_name
 
 CONNECTION_CONFIG_DIR = 'export_connection.conf'
 CSV_FILES_PATH = 'csv_files/'
@@ -57,6 +57,22 @@ def export_extra_function_res_partner_no_names():
     partners_dataframe.to_csv(partners_without_name_file_path, index=False)
 
 models_migration_config['res.partner']['export_extra_functions'] = [export_extra_function_res_partner_no_names]
+
+def export_extra_function_res_users_groups():
+    model_name = 'res.users'
+    model_migration_config = models_migration_config[model_name]
+
+    fields_to_export = ['id', 'groups_id', 'groups_id/id']
+    export_data(model_name=model_name,
+                fields=fields_to_export,
+                output_file=res_users_groups_file_name,
+    )
+    res_users_groups_file_path = f'{CSV_FILES_PATH}{res_users_groups_file_name}'
+    users_dataframe = pandas.read_csv(res_users_groups_file_path)
+    users_dataframe.fillna(method='ffill', inplace=True)
+    users_dataframe.to_csv(res_users_groups_file_path, index=False)
+
+models_migration_config['res.users']['export_extra_functions'] = [export_extra_function_res_users_groups]
 
 
 for model_name in models_migration_config:
