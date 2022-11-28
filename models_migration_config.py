@@ -11,7 +11,10 @@ models_migration_config = {
     'res.users': {
         'fields': ['id', 'active', 'login', 'email', 'name', 'partner_id/id', 'login_date', 'lang', 'tz', 'notification_type'],
         'domain': ['|', ['active', '=', True], ['active', '=', False], ['id', '>', 5]], # Skip Odoo's default users
-    }
+    },
+    'crm.lead.tag': {
+        'fields': ['id', 'color', 'name']
+    },
 }
 
 partners_without_name_file_name = 'res.partner(no name).csv'

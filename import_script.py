@@ -28,6 +28,8 @@ def import_data(model_name = None, file_csv = None, context = None, separator = 
     if not batch_size:
         batch_size = model_migration_config.get('batch_size', DEFAULT_BATCH_SIZE)
 
+    if model_name == 'crm.lead.tag':
+        model_name = 'crm.tag'
 
     import_threaded.import_data(CONNECTION_CONFIG_DIR,
                                 model_name,
