@@ -89,6 +89,21 @@ def export_extra_function_crm_team_members():
 
 models_migration_config['crm.team']['export_extra_functions'] = [export_extra_function_crm_team_members]
 
+def export_extra_function_crm_lead():
+    model_name = 'crm.lead'
+
+    export_data(model_name=model_name)
+    crm_lead_file_path = f'{CSV_FILES_PATH}{model_name}.csv'
+    crm_lead_dataframe = pandas.read_csv(crm_lead_file_path)
+    crm_lead_dataframe.rename(columns={'planned_revenue': 'expected_revenue'}, inplace=True)
+    crm_lead_dataframe['priority'] = crm_lead_dataframe['priority'].str.replace('Low', 'Medium')
+    crm_lead_dataframe['priority'] = crm_lead_dataframe['priority'].str.replace('Normal', 'Low')
+    crm_lead_dataframe['tag_ids/id'] = crm_lead_dataframe['tag_ids/id'].str.replace('False', '')
+    crm_lead_dataframe.to_csv(crm_lead_file_path, index=False)
+
+models_migration_config['crm.lead']['export_override_function'] = export_extra_function_crm_lead
+
+
 
 for model_name in models_migration_config:
     model_migration_config = models_migration_config[model_name]

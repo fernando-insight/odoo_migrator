@@ -22,6 +22,11 @@ models_migration_config = {
         'fields': ['id', 'name', 'active', 'user_id/id', 'alias_name', 'use_quotations', 'use_opportunities', 'use_leads', 'alias_contact', 'invoiced_target'],
         'domain': ['|', ['active', '=', True], ['active', '=', False]],
     },
+     'crm.lead': {
+        'fields': ['id', 'active', 'name', 'description', 'type', 'date_open', 'date_closed', 'message_bounce', 'priority', 'planned_revenue', 'probability', 'date_deadline', 'partner_name', 'street', 'street2', 'city', 'state_id/id', 'zip', 'country_id/id', 'website', 'partner_id/id', 'user_id/id', 'stage_id/id', 'team_id/id', 'tag_ids/id'],
+        'domain': ['|', ['active', '=', True], ['active', '=', False]],
+        'group_by': 'stage_id/id',
+    },
 }
 
 partners_without_name_file_name = 'res.partner(no name).csv'
