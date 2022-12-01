@@ -3,7 +3,8 @@ import os
 import pandas
 
 from odoo_csv_tools import export_threaded
-from models_migration_config import models_migration_config, partners_without_name_file_name, res_users_groups_file_name
+from models_migration_config import models_migration_config, partners_without_name_file_name, \
+    res_users_groups_file_name, crm_team_members_file_name
 
 CONNECTION_CONFIG_DIR = 'export_connection.conf'
 CSV_FILES_PATH = 'csv_files/'
@@ -60,7 +61,6 @@ models_migration_config['res.partner']['export_extra_functions'] = [export_extra
 
 def export_extra_function_res_users_groups():
     model_name = 'res.users'
-    model_migration_config = models_migration_config[model_name]
 
     fields_to_export = ['id', 'groups_id', 'groups_id/id']
     export_data(model_name=model_name,
@@ -73,6 +73,21 @@ def export_extra_function_res_users_groups():
     users_dataframe.to_csv(res_users_groups_file_path, index=False)
 
 models_migration_config['res.users']['export_extra_functions'] = [export_extra_function_res_users_groups]
+
+def export_extra_function_crm_team_members():
+    model_name = 'crm.team'
+
+    fields_to_export = ['id', 'member_ids', 'member_ids/id']
+    export_data(model_name=model_name,
+                fields=fields_to_export,
+                output_file=crm_team_members_file_name
+    )
+    crm_team_file_path = f'{CSV_FILES_PATH}{crm_team_members_file_name}'
+    crm_team_dataframe = pandas.read_csv(crm_team_file_path)
+    crm_team_dataframe.fillna(method='ffill', inplace=True)
+    crm_team_dataframe.to_csv(crm_team_file_path, index=False)
+
+models_migration_config['crm.team']['export_extra_functions'] = [export_extra_function_crm_team_members]
 
 
 for model_name in models_migration_config:

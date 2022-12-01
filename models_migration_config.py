@@ -15,7 +15,15 @@ models_migration_config = {
     'crm.lead.tag': {
         'fields': ['id', 'color', 'name']
     },
+    'crm.stage': {
+        'fields': ['id', 'fold', 'sequence', 'name'],
+    },
+    'crm.team': {
+        'fields': ['id', 'name', 'active', 'user_id/id', 'alias_name', 'use_quotations', 'use_opportunities', 'use_leads', 'alias_contact', 'invoiced_target'],
+        'domain': ['|', ['active', '=', True], ['active', '=', False]],
+    },
 }
 
 partners_without_name_file_name = 'res.partner(no name).csv'
 res_users_groups_file_name = 'res.users(groups).csv'
+crm_team_members_file_name = 'crm.team(members).csv'

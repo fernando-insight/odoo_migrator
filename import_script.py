@@ -3,7 +3,8 @@
 import os
 
 from odoo_csv_tools import import_threaded
-from models_migration_config import models_migration_config, partners_without_name_file_name, res_users_groups_file_name
+from models_migration_config import models_migration_config, partners_without_name_file_name, \
+    res_users_groups_file_name, crm_team_members_file_name
 
 CONNECTION_CONFIG_DIR = 'import_connection.conf'
 REQ_CONTEXT = {'tracking_disable' : True}
@@ -71,6 +72,12 @@ def res_users_import():
 
 models_migration_config['res.users']['import_override_function'] = res_users_import
 
+def crm_team_import():
+    model_name = 'crm.team'
+    import_data(model_name=model_name)
+    import_data(model_name=model_name, ignore_fields=['member_ids'], file_csv=crm_team_members_file_name, workers=1, context={'update_many2many': True})
+
+models_migration_config['crm.team']['import_override_function'] = crm_team_import
 
 for model_name in models_migration_config:
     model_migration_config = models_migration_config[model_name]
