@@ -3,27 +3,28 @@
 import os
 
 from odoo_csv_tools import import_threaded
-from models_migration_config import models_migration_config, partners_without_name_file_name, \
-    res_users_groups_file_name, crm_team_members_file_name
+from models_migration_config import GENERATED_CSV_FILES_PATH, models_migration_config, \
+    partners_without_name_file_name, res_users_groups_file_name, crm_team_members_file_name
 
 CONNECTION_CONFIG_DIR = 'import_connection.conf'
 REQ_CONTEXT = {'tracking_disable' : True}
-CSV_FILES_PATH = 'csv_files/'
 DEFAULT_WORKERS = int(os.environ.get('DEFAULT_WORKERS', 2))
 DEFAULT_BATCH_SIZE = 1000
 
 def import_data(model_name = None, file_csv = None, context = None, separator = None, ignore_fields = None, group_by = None, workers = None, batch_size = None):
     model_migration_config = models_migration_config[model_name]
     if file_csv:
-        file_csv = f'{CSV_FILES_PATH}{file_csv}'
+        file_csv = f'{GENERATED_CSV_FILES_PATH}{file_csv}'
     elif not file_csv:
-        file_csv = f'{CSV_FILES_PATH}{model_name}.csv'
+        file_csv = f'{GENERATED_CSV_FILES_PATH}{model_name}.csv'
     if not context:
         context = model_migration_config.get('context', REQ_CONTEXT)
     if not separator:
         separator = model_migration_config.get('separator', ',')
     if not ignore_fields:
         ignore_fields = model_migration_config.get('ignore_fields', [])
+    if not group_by:
+        group_by = model_migration_config.get('group_by', False)
     if not workers:
         workers = DEFAULT_WORKERS
     if not batch_size:
@@ -57,7 +58,7 @@ def res_partner_import():
     #import partners without name
     import_data(model_name=model_name, file_csv=partners_without_name_file_name)
     #import the rest of the partners
-    import_data(model_name=model_name)
+    import_data(model_name=model_name, group_by='parent_id/id', workers=1)
 
     ignore_fields = ['id', 'name'] + models_migration_config['res.partner']['ignore_fields']
     import_ignored_fields(model_name, ignore_fields = ignore_fields, workers=1)

@@ -4,7 +4,7 @@ models_migration_config = {
         'ignore_fields': ['parent_id/id'],
     },
     'res.partner': {
-        'fields': ['id', 'active', 'name', 'phone', 'email', 'parent_id/id'],
+        'fields': ['id', 'active', 'name', 'phone', 'email', 'company_type', 'message_bounce', 'type', 'street', 'street2', 'city', 'zip', 'state_id/id', 'country_id/id', 'categ_id/id', 'parent_id/id'],
         'domain': ['|', ['active', '=', True], ['active', '=', False], ['name', '!=', False], ['name', '!=', '']],
         'ignore_fields': ['parent_id/id'],
     },
@@ -29,6 +29,10 @@ models_migration_config = {
     },
 }
 
+GENERATED_CSV_FILES_PATH = 'generated_csv_files/'
+INPUT_CSV_FIILES_PATH = 'input_csv_files/'
+
 partners_without_name_file_name = 'res.partner(no name).csv'
 res_users_groups_file_name = 'res.users(groups).csv'
 crm_team_members_file_name = 'crm.team(members).csv'
+states_remapping_file_name = 'States Remapping - Input.csv'
