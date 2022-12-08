@@ -2,11 +2,18 @@
 import os
 import pandas
 import numpy
-import math
+import argparse
 
 from odoo_csv_tools import export_threaded
+
 from models_migration_config import GENERATED_CSV_FILES_PATH, INPUT_CSV_FIILES_PATH, models_migration_config, partners_without_name_file_name, \
     res_users_groups_file_name, crm_team_members_file_name, states_remapping_file_name
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--models', action='append')
+
+models_arg = parser.parse_args()
+models_to_export = models_arg.models or []
 
 CONNECTION_CONFIG_DIR = 'export_connection.conf'
 DEFAULT_REQ_CONTEXT = {}
@@ -153,6 +160,7 @@ def export_override_function_mail_message():
     mail_message_dataframe = pandas.read_csv(mail_message_file_path)
 
     mail_message_dataframe['subtype_id/id'] = mail_message_dataframe['subtype_id/id'].str.replace('False', '')
+    mail_message_dataframe['partner_ids/id'] = mail_message_dataframe['partner_ids/id'].str.replace('False', '')
 
     models_with_mail_messages = list(mail_message_dataframe['model'].unique())
     models_to_export_external_ids = [m for m in models_with_mail_messages if m in models_migration_config.keys()]
@@ -179,21 +187,19 @@ def export_override_function_mail_message():
     ir_model_data_old_dataframe.rename(columns={'res_id': 'old_res_id'}, inplace=True)
     ir_model_data_merged_dataframe = ir_model_data_new_dataframe.merge(ir_model_data_old_dataframe, on=['complete_name', 'model'], how='left')
     ir_model_data_merged_dataframe.rename(columns={'res_id': 'new_res_id'}, inplace=True)
-    ir_model_data_merged_dataframe.to_csv(merged_data_frame_file_path, index=False)
-
-
-    ir_model_data_merged_dataframe = pandas.read_csv(merged_data_frame_file_path)
-    admin_partner_index = numpy.where(ir_model_data_merged_dataframe['complete_name'] == 'base.partner_admin')[0]
-    template_user_partner_index = numpy.where(ir_model_data_merged_dataframe['complete_name'] == 'base.template_portal_user_id_res_partner')[0]
-
     # These partners can't be deleted so these ids won't change
     admin_old_res_id = 3
     template_user_res_id = 6
+    admin_partner_index = numpy.where(ir_model_data_merged_dataframe['complete_name'] == 'base.partner_admin')[0]
+    template_user_partner_index = numpy.where(ir_model_data_merged_dataframe['complete_name'] == 'base.template_portal_user_id_res_partner')[0]
     ir_model_data_merged_dataframe['old_res_id'][admin_partner_index] = admin_old_res_id
     ir_model_data_merged_dataframe['old_res_id'][template_user_partner_index] = template_user_res_id
     ir_model_data_merged_dataframe['model'][admin_partner_index] = 'res.partner'
     ir_model_data_merged_dataframe['model'][template_user_partner_index] = 'res.partner'
     ir_model_data_merged_dataframe['old_res_id'] = ir_model_data_merged_dataframe['old_res_id'].astype('int')
+    ir_model_data_merged_dataframe.to_csv(merged_data_frame_file_path, index=False)
+
+    #ir_model_data_merged_dataframe = pandas.read_csv(merged_data_frame_file_path)
 
     # Merge the mail.message dataframe with ir_model_data_merged_dataframe to get the new database ids
     mail_message_dataframe = mail_message_dataframe.merge(ir_model_data_merged_dataframe, left_on=['model', 'res_id'], right_on=['model', 'old_res_id'], how='inner')
@@ -207,7 +213,8 @@ def export_override_function_mail_message():
 models_migration_config['mail.message']['export_override_function'] = export_override_function_mail_message
 
 
-for model_name in models_migration_config:
+models_to_export = models_to_export or models_migration_config.keys()
+for model_name in models_to_export:
     model_migration_config = models_migration_config[model_name]
     if 'export_override_function' not in model_migration_config:
         export_data(model_name=model_name)

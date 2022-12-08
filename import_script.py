@@ -1,10 +1,16 @@
 #!/usr/bin/env python
-
 import os
+import argparse
 
 from odoo_csv_tools import import_threaded
 from models_migration_config import GENERATED_CSV_FILES_PATH, models_migration_config, \
     partners_without_name_file_name, res_users_groups_file_name, crm_team_members_file_name
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--models', action='append')
+
+models_arg = parser.parse_args()
+models_to_import = models_arg.models or []
 
 CONNECTION_CONFIG_DIR = 'import_connection.conf'
 REQ_CONTEXT = {'tracking_disable' : True}
@@ -44,13 +50,15 @@ def import_data(model_name = None, file_csv = None, context = None, separator = 
                                 batch_size=batch_size,
     )
 
-def import_ignored_fields(model_name, file_csv = None, ignore_fields = [], workers = DEFAULT_WORKERS):
+def import_ignored_fields(model_name, fields = None, file_csv = None,  ignore_fields = [], group_by = [], workers = DEFAULT_WORKERS):
     model_migration_config = models_migration_config[model_name]
+    if not fields:
+        fields = model_migration_config['fields']
     ignore_fields = ignore_fields or model_migration_config.get('ignore_fields', [])
     if ignore_fields:
         # import the ignored fields
-        added_fields = list(f for f in model_migration_config['fields'] if f not in ignore_fields and f not in ['id'])
-        import_data(model_name, file_csv=file_csv, ignore_fields=added_fields, workers = workers)
+        added_fields = list(f for f in fields if f not in ignore_fields and f not in ['id'])
+        import_data(model_name, file_csv=file_csv, ignore_fields=added_fields, group_by = group_by, workers = workers)
 
 
 def res_partner_import():
@@ -82,12 +90,14 @@ models_migration_config['crm.team']['import_override_function'] = crm_team_impor
 
 def mail_message_import():
     model_name = 'mail.message'
-    import_data(model_name=model_name, ignore_fields=['old_res_id', 'old_res_id2', 'complete_name'], workers=1)
+    ignored_fields = ['old_res_id', 'old_res_id2', 'complete_name', 'parent_id/id']
+    import_data(model_name=model_name, ignore_fields=ignored_fields, workers=1)
 
 models_migration_config['mail.message']['import_override_function'] = mail_message_import
 
 
-for model_name in models_migration_config:
+models_to_import = models_to_import or models_migration_config.keys()
+for model_name in models_to_import:
     model_migration_config = models_migration_config[model_name]
     if 'import_override_function' not in model_migration_config:
         ignore_fields = model_migration_config.get('ignore_fields')
