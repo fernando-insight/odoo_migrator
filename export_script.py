@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
 import pandas
+import numpy
 import math
 
 from odoo_csv_tools import export_threaded
@@ -12,8 +13,14 @@ DEFAULT_REQ_CONTEXT = {}
 DEFAULT_BATCH_SIZE = 3000
 DEFAULT_WORKERS = int(os.environ.get('DEFAULT_WORKERS', 2))
 
-def export_data(model_name = None, domain = None, fields = None, output_file = None, workers = None, batch_size = None, context = None, separator = None):
-    model_migration_config = models_migration_config[model_name]
+def export_data(config = None, model_name = None, domain = None, fields = None, output_file = None, workers = None, batch_size = None, context = None, separator = None):
+    if model_name == 'ir.model.data':
+        model_migration_config = {}
+    else:
+        model_migration_config = models_migration_config[model_name]
+
+    if not config:
+        config = CONNECTION_CONFIG_DIR
     if not domain:
         domain = model_migration_config.get('domain', [])
     if not fields:
@@ -31,7 +38,8 @@ def export_data(model_name = None, domain = None, fields = None, output_file = N
     if not separator:
         separator = model_migration_config.get('separator', ',')
 
-    export_threaded.export_data(CONNECTION_CONFIG_DIR,
+
+    export_threaded.export_data(config,
                                 model_name,
                                 domain,
                                 fields,
@@ -123,7 +131,7 @@ def export_extra_function_crm_team_members():
 
 models_migration_config['crm.team']['export_extra_functions'] = [export_extra_function_crm_team_members]
 
-def export_extra_function_crm_lead():
+def export_override_function_crm_lead():
     model_name = 'crm.lead'
 
     export_data(model_name=model_name)
@@ -135,8 +143,68 @@ def export_extra_function_crm_lead():
     crm_lead_dataframe['tag_ids/id'] = crm_lead_dataframe['tag_ids/id'].str.replace('False', '')
     crm_lead_dataframe.to_csv(crm_lead_file_path, index=False)
 
-models_migration_config['crm.lead']['export_override_function'] = export_extra_function_crm_lead
+models_migration_config['crm.lead']['export_override_function'] = export_override_function_crm_lead
 
+def export_override_function_mail_message():
+    model_name = 'mail.message'
+
+    export_data(model_name=model_name)
+    mail_message_file_path = f'{GENERATED_CSV_FILES_PATH}{model_name}.csv'
+    mail_message_dataframe = pandas.read_csv(mail_message_file_path)
+
+    mail_message_dataframe['subtype_id/id'] = mail_message_dataframe['subtype_id/id'].str.replace('False', '')
+
+    models_with_mail_messages = list(mail_message_dataframe['model'].unique())
+    models_to_export_external_ids = [m for m in models_with_mail_messages if m in models_migration_config.keys()]
+    #Export external_ids
+    fields_to_export = ['complete_name', 'res_id', 'model']
+    export_data(model_name='ir.model.data',
+                fields=fields_to_export,
+                output_file='ir.model.data.old.csv',
+                domain=[['model', 'in', models_to_export_external_ids]]
+    )
+    #Export v15 external_ids
+    export_data(config='import_connection.conf',
+                model_name='ir.model.data',
+                fields=fields_to_export,
+                output_file='ir.model.data.new.csv',
+                domain=[['model', 'in', models_to_export_external_ids]]
+    )
+    external_ids_old_file_path = f'{GENERATED_CSV_FILES_PATH}ir.model.data.old.csv'
+    external_ids_new_file_path = f'{GENERATED_CSV_FILES_PATH}ir.model.data.new.csv'
+    merged_data_frame_file_path = f'{GENERATED_CSV_FILES_PATH}ir.model.data.merged.csv'
+    ir_model_data_old_dataframe = pandas.read_csv(external_ids_old_file_path)
+    ir_model_data_new_dataframe = pandas.read_csv(external_ids_new_file_path)
+    # Merge old and new external ids to extract the new database id
+    ir_model_data_old_dataframe.rename(columns={'res_id': 'old_res_id'}, inplace=True)
+    ir_model_data_merged_dataframe = ir_model_data_new_dataframe.merge(ir_model_data_old_dataframe, on=['complete_name', 'model'], how='left')
+    ir_model_data_merged_dataframe.rename(columns={'res_id': 'new_res_id'}, inplace=True)
+    ir_model_data_merged_dataframe.to_csv(merged_data_frame_file_path, index=False)
+
+
+    ir_model_data_merged_dataframe = pandas.read_csv(merged_data_frame_file_path)
+    admin_partner_index = numpy.where(ir_model_data_merged_dataframe['complete_name'] == 'base.partner_admin')[0]
+    template_user_partner_index = numpy.where(ir_model_data_merged_dataframe['complete_name'] == 'base.template_portal_user_id_res_partner')[0]
+
+    # These partners can't be deleted so these ids won't change
+    admin_old_res_id = 3
+    template_user_res_id = 6
+    ir_model_data_merged_dataframe['old_res_id'][admin_partner_index] = admin_old_res_id
+    ir_model_data_merged_dataframe['old_res_id'][template_user_partner_index] = template_user_res_id
+    ir_model_data_merged_dataframe['model'][admin_partner_index] = 'res.partner'
+    ir_model_data_merged_dataframe['model'][template_user_partner_index] = 'res.partner'
+    ir_model_data_merged_dataframe['old_res_id'] = ir_model_data_merged_dataframe['old_res_id'].astype('int')
+
+    # Merge the mail.message dataframe with ir_model_data_merged_dataframe to get the new database ids
+    mail_message_dataframe = mail_message_dataframe.merge(ir_model_data_merged_dataframe, left_on=['model', 'res_id'], right_on=['model', 'old_res_id'], how='inner')
+    mail_message_dataframe.rename(columns={'res_id': 'old_res_id'}, inplace=True)
+    mail_message_dataframe.rename(columns={'new_res_id': 'res_id'}, inplace=True)
+    mail_message_dataframe['res_id'] = mail_message_dataframe['res_id'].astype('int')
+
+    mail_message_dataframe.sort_values('date', ascending=True, inplace=True)
+    mail_message_dataframe.to_csv(mail_message_file_path, index=False)
+
+models_migration_config['mail.message']['export_override_function'] = export_override_function_mail_message
 
 
 for model_name in models_migration_config:

@@ -80,6 +80,13 @@ def crm_team_import():
 
 models_migration_config['crm.team']['import_override_function'] = crm_team_import
 
+def mail_message_import():
+    model_name = 'mail.message'
+    import_data(model_name=model_name, ignore_fields=['old_res_id', 'old_res_id2', 'complete_name'], workers=1)
+
+models_migration_config['mail.message']['import_override_function'] = mail_message_import
+
+
 for model_name in models_migration_config:
     model_migration_config = models_migration_config[model_name]
     if 'import_override_function' not in model_migration_config:

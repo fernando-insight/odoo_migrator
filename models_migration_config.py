@@ -27,6 +27,11 @@ models_migration_config = {
         'domain': ['|', ['active', '=', True], ['active', '=', False]],
         'group_by': 'stage_id/id',
     },
+    'mail.message': {
+        'fields': ['id', 'res_id', 'model', 'message_type', 'body', 'subtype_id/id', 'message_id', 'date', 'email_from', 'author_id/id', 'record_name'],
+        'domain': [['message_type', '=', 'comment'], ['model', 'in', ['res.partner', 'crm.lead']]],#['model', '!=', 'calendar.event']], No permissions for calendar.events
+    }
+
 }
 
 GENERATED_CSV_FILES_PATH = 'generated_csv_files/'
