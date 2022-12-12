@@ -29,7 +29,7 @@ models_migration_config = {
     },
     'mail.message': {
         'fields': ['id', 'res_id', 'model', 'message_type', 'body', 'subtype_id/id', 'message_id', 'subject', 'date', 'email_from', 'author_id/id', 'record_name', 'partner_ids/id', 'parent_id/id'],
-        'domain': [['message_type', 'in', ['comment', 'email']], ['model', 'in', ['res.partner', 'crm.lead']]],#['model', '!=', 'calendar.event']], No permissions for calendar.events
+        'domain': [['message_type', 'in', ['comment', 'email']], ['model', 'in', ['res.partner', 'crm.lead', 'crm.team', 'crm.stage']]],
     }
 
 }

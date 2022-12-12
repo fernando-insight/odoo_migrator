@@ -6,8 +6,9 @@ import argparse
 
 from odoo_csv_tools import export_threaded
 
-from models_migration_config import GENERATED_CSV_FILES_PATH, INPUT_CSV_FIILES_PATH, models_migration_config, partners_without_name_file_name, \
+from models_migration_config import models_migration_config, GENERATED_CSV_FILES_PATH, INPUT_CSV_FIILES_PATH, partners_without_name_file_name, \
     res_users_groups_file_name, crm_team_members_file_name, states_remapping_file_name
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--models', action='append')
@@ -111,15 +112,20 @@ models_migration_config['res.partner']['export_extra_functions'] = [
 def export_extra_function_res_users_groups():
     model_name = 'res.users'
 
+    res_users_file_path = f'{GENERATED_CSV_FILES_PATH}{model_name}.csv'
+    users_dataframe = pandas.read_csv(res_users_file_path)
+    users_dataframe.rename(columns={'image': 'image_1920'}, inplace=True)
+    users_dataframe.to_csv(res_users_file_path, index=False)
+
     fields_to_export = ['id', 'groups_id', 'groups_id/id']
     export_data(model_name=model_name,
                 fields=fields_to_export,
                 output_file=res_users_groups_file_name,
     )
     res_users_groups_file_path = f'{GENERATED_CSV_FILES_PATH}{res_users_groups_file_name}'
-    users_dataframe = pandas.read_csv(res_users_groups_file_path)
-    users_dataframe.fillna(method='ffill', inplace=True)
-    users_dataframe.to_csv(res_users_groups_file_path, index=False)
+    users_groups_dataframe = pandas.read_csv(res_users_groups_file_path)
+    users_groups_dataframe.fillna(method='ffill', inplace=True)
+    users_groups_dataframe.to_csv(res_users_groups_file_path, index=False)
 
 models_migration_config['res.users']['export_extra_functions'] = [export_extra_function_res_users_groups]
 
@@ -183,23 +189,15 @@ def export_override_function_mail_message():
     merged_data_frame_file_path = f'{GENERATED_CSV_FILES_PATH}ir.model.data.merged.csv'
     ir_model_data_old_dataframe = pandas.read_csv(external_ids_old_file_path)
     ir_model_data_new_dataframe = pandas.read_csv(external_ids_new_file_path)
+    ir_model_data_old_dataframe['complete_name'] = ir_model_data_old_dataframe['complete_name'].str.replace('base.partner_root', 'base.partner_admin')
+    ir_model_data_old_dataframe['complete_name'] = ir_model_data_old_dataframe['complete_name'].str.replace('base.default_user_res_partner', 'base.template_portal_user_id_res_partner')
+    ir_model_data_old_dataframe.to_csv(external_ids_old_file_path, index=False)
     # Merge old and new external ids to extract the new database id
     ir_model_data_old_dataframe.rename(columns={'res_id': 'old_res_id'}, inplace=True)
-    ir_model_data_merged_dataframe = ir_model_data_new_dataframe.merge(ir_model_data_old_dataframe, on=['complete_name', 'model'], how='left')
+    ir_model_data_merged_dataframe = ir_model_data_new_dataframe.merge(ir_model_data_old_dataframe, on=['complete_name', 'model'], how='inner')
     ir_model_data_merged_dataframe.rename(columns={'res_id': 'new_res_id'}, inplace=True)
-    # These partners can't be deleted so these ids won't change
-    admin_old_res_id = 3
-    template_user_res_id = 6
-    admin_partner_index = numpy.where(ir_model_data_merged_dataframe['complete_name'] == 'base.partner_admin')[0]
-    template_user_partner_index = numpy.where(ir_model_data_merged_dataframe['complete_name'] == 'base.template_portal_user_id_res_partner')[0]
-    ir_model_data_merged_dataframe['old_res_id'][admin_partner_index] = admin_old_res_id
-    ir_model_data_merged_dataframe['old_res_id'][template_user_partner_index] = template_user_res_id
-    ir_model_data_merged_dataframe['model'][admin_partner_index] = 'res.partner'
-    ir_model_data_merged_dataframe['model'][template_user_partner_index] = 'res.partner'
     ir_model_data_merged_dataframe['old_res_id'] = ir_model_data_merged_dataframe['old_res_id'].astype('int')
     ir_model_data_merged_dataframe.to_csv(merged_data_frame_file_path, index=False)
-
-    #ir_model_data_merged_dataframe = pandas.read_csv(merged_data_frame_file_path)
 
     # Merge the mail.message dataframe with ir_model_data_merged_dataframe to get the new database ids
     mail_message_dataframe = mail_message_dataframe.merge(ir_model_data_merged_dataframe, left_on=['model', 'res_id'], right_on=['model', 'old_res_id'], how='inner')
