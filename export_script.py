@@ -22,7 +22,7 @@ DEFAULT_BATCH_SIZE = 3000
 DEFAULT_WORKERS = int(os.environ.get('DEFAULT_WORKERS', 2))
 
 def export_data(config = None, model_name = None, domain = None, fields = None, output_file = None, workers = None, batch_size = None, context = None, separator = None):
-    if model_name == 'ir.model.data':
+    if model_name in ['ir.model.data', 'ir.model.fields']:
         model_migration_config = {}
     else:
         model_migration_config = models_migration_config[model_name]
@@ -209,6 +209,49 @@ def export_override_function_mail_message():
     mail_message_dataframe.to_csv(mail_message_file_path, index=False)
 
 models_migration_config['mail.message']['export_override_function'] = export_override_function_mail_message
+
+def export_override_function_mail_tracking_value():
+    model_name = 'mail.tracking.value'
+    mail_tracking_value_all_file_name = f'{model_name}.all.csv'
+    mail_tracking_value_all_file_path = f'{GENERATED_CSV_FILES_PATH}{mail_tracking_value_all_file_name}'
+    mail_tracking_value_file_path = f'{GENERATED_CSV_FILES_PATH}{model_name}.csv'
+    export_data(model_name=model_name, output_file=mail_tracking_value_all_file_name)
+    mail_tracking_value_dataframe = pandas.read_csv(mail_tracking_value_all_file_path, low_memory=False)
+
+    mail_message_file_path = f'{GENERATED_CSV_FILES_PATH}mail.message.csv'
+    mail_message_dataframe = pandas.read_csv(mail_message_file_path, low_memory=False)
+    mail_message_dataframe.rename(columns={'id': 'mail_message_id/id'}, inplace=True)
+
+    #Merge tracking values with mail.message to filter the tracking values to import and adding the model column
+    mail_message_dataframe = mail_message_dataframe[['model', 'mail_message_id/id']]
+    mail_tracking_value_dataframe = mail_tracking_value_dataframe.merge(mail_message_dataframe, on='mail_message_id/id', how='inner')
+
+    #Export v15 ir_model_fields
+    fields_model_name = 'ir.model.fields'
+    models_with_mail_messages = list(mail_message_dataframe['model'].unique())
+    models_to_export_external_ids = [m for m in models_with_mail_messages if m in models_migration_config.keys()]
+    export_data(config='import_connection.conf',
+                model_name=fields_model_name,
+                fields=['id', 'name', 'model'],
+                output_file=f'{fields_model_name}.csv',
+                domain=[['model', 'in', models_to_export_external_ids]]
+    )
+    ir_model_fields_file_path = f'{GENERATED_CSV_FILES_PATH}{fields_model_name}.csv'
+    fields_dataframe = pandas.read_csv(ir_model_fields_file_path)
+    fields_dataframe.rename(columns={'id': 'field/id'}, inplace=True)
+    fields_dataframe.rename(columns={'name': 'field'}, inplace=True)
+
+    #Merge tracking values with fields to extract the fields' external ids
+    mail_tracking_value_dataframe['field'] = mail_tracking_value_dataframe['field'].str.replace('planned_revenue', 'expected_revenue')
+    mail_tracking_value_dataframe['field'] = mail_tracking_value_dataframe['field'].str.replace('categ_id', 'category_id')
+    mail_tracking_value_dataframe = mail_tracking_value_dataframe.merge(fields_dataframe, on=['field', 'model'], how='inner')
+    # Drop columns used just to merge
+    mail_tracking_value_dataframe.drop(columns={'field', 'model'}, inplace=True)
+
+    mail_tracking_value_dataframe.to_csv(mail_tracking_value_file_path, index=False)
+
+
+models_migration_config['mail.tracking.value']['export_override_function'] = export_override_function_mail_tracking_value
 
 
 models_to_export = models_to_export or models_migration_config.keys()

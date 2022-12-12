@@ -91,7 +91,7 @@ models_migration_config['crm.team']['import_override_function'] = crm_team_impor
 def mail_message_import():
     model_name = 'mail.message'
     ignored_fields = ['old_res_id', 'old_res_id2', 'complete_name', 'parent_id/id']
-    import_data(model_name=model_name, ignore_fields=ignored_fields, workers=1)
+    import_data(model_name=model_name, ignore_fields=ignored_fields, group_by='complete_name')
 
 models_migration_config['mail.message']['import_override_function'] = mail_message_import
 
