@@ -32,7 +32,7 @@ def import_data(model_name = None, file_csv = None, context = None, separator = 
     if not group_by:
         group_by = model_migration_config.get('group_by', False)
     if not workers:
-        workers = DEFAULT_WORKERS
+        workers = model_migration_config.get('workers', DEFAULT_WORKERS)
     if not batch_size:
         batch_size = model_migration_config.get('batch_size', DEFAULT_BATCH_SIZE)
 

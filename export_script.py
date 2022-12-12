@@ -154,6 +154,8 @@ def export_override_function_crm_lead():
     crm_lead_dataframe['priority'] = crm_lead_dataframe['priority'].str.replace('Low', 'Medium')
     crm_lead_dataframe['priority'] = crm_lead_dataframe['priority'].str.replace('Normal', 'Low')
     crm_lead_dataframe['tag_ids/id'] = crm_lead_dataframe['tag_ids/id'].str.replace('False', '')
+    crm_lead_dataframe.sort_values('id', inplace=True)
+
     crm_lead_dataframe.to_csv(crm_lead_file_path, index=False)
 
 models_migration_config['crm.lead']['export_override_function'] = export_override_function_crm_lead
