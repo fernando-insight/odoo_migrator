@@ -244,6 +244,7 @@ def export_override_function_mail_tracking_value():
     #Merge tracking values with fields to extract the fields' external ids
     mail_tracking_value_dataframe['field'] = mail_tracking_value_dataframe['field'].str.replace('planned_revenue', 'expected_revenue')
     mail_tracking_value_dataframe['field'] = mail_tracking_value_dataframe['field'].str.replace('categ_id', 'category_id')
+    mail_tracking_value_dataframe['field'] = mail_tracking_value_dataframe['field'].str.replace('salesperson_ids', 'user_id')
     mail_tracking_value_dataframe = mail_tracking_value_dataframe.merge(fields_dataframe, on=['field', 'model'], how='inner')
     # Drop columns used just to merge
     mail_tracking_value_dataframe.drop(columns={'field', 'model'}, inplace=True)

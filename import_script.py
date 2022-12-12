@@ -69,7 +69,6 @@ def res_partner_import():
     import_data(model_name=model_name, group_by='parent_id/id', workers=1)
 
     ignore_fields = ['id', 'name'] + models_migration_config['res.partner']['ignore_fields']
-    import_ignored_fields(model_name, ignore_fields = ignore_fields, workers=1)
     import_ignored_fields(model_name, file_csv=partners_without_name_file_name, ignore_fields = ignore_fields, workers=1)
 
 models_migration_config['res.partner']['import_override_function'] = res_partner_import
@@ -78,6 +77,9 @@ def res_users_import():
     model_name = 'res.users'
     import_data(model_name=model_name)
     import_data(model_name=model_name, ignore_fields=['groups_id'], file_csv=res_users_groups_file_name, workers=1, batch_size=1, context={'update_many2many': True})
+    #Import remaining res.partner fields
+    ignore_fields = ['id', 'name'] + models_migration_config['res.partner']['ignore_fields']
+    import_ignored_fields('res.partner', ignore_fields = ignore_fields, workers=1)
 
 models_migration_config['res.users']['import_override_function'] = res_users_import
 
