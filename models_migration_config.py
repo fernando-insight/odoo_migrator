@@ -45,6 +45,17 @@ models_migration_config = {
         'domain': ['|', ['active', '=', True], ['active', '=', False]],
         'workers': 1
     },
+    'product.category': {
+        'fields': ['id', 'name', 'property_cost_method', 'property_valuation', 'parent_id/id'],
+        'ignore_fields': ['parent_id/id']
+    },
+    'product.template': {
+        'fields': ['id', 'name', 'active', 'default_code', 'categ_id/id', 'tracking', 'barcode', 'sale_ok', 'purchase_ok', 'sequence', 'can_be_expensed', 'type', 'invoice_policy', 'purchase_method', 'list_price', 'description', 'description_sale', 'description_purchase', 'responsible_id/id', 'create_uid/id', 'create_date', 'weight', 'volume'],
+        'domain': ['|', ['active', '=', True], ['active', '=', False]],
+    },
+    'product.product': {
+        'fields': ['id', 'name', 'active', 'product_tmpl_id/id']
+    },
     'mail.message': {
         'fields': ['id', 'res_id', 'model', 'message_type', 'body', 'subtype_id/id', 'message_id', 'subject', 'date', 'email_from', 'author_id/id', 'record_name', 'partner_ids/id', 'parent_id/id'],
         'domain': [['model', 'in', ['res.partner', 'crm.lead', 'crm.team', 'crm.stage']]],
