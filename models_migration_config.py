@@ -49,16 +49,34 @@ models_migration_config = {
         'fields': ['id', 'name', 'property_cost_method', 'property_valuation', 'parent_id/id'],
         'ignore_fields': ['parent_id/id']
     },
+    'product.uom.categ': {
+        'fields': ['id', 'name'],
+    },
+    'uom.category': {
+       # New Model name of product.uom.category
+    },
+    'uom.uom': {
+        # New Model name of product.uom
+    },
+    'product.uom': {
+        'fields': ['id', 'active', 'name', 'category_id/id', 'uom_type', 'rounding', 'factor', 'factor_inv'],
+        'domain': ['|', ['active', '=', True], ['active', '=', False],
+                   ['id', 'not in', [25, 26, 27, 28]]],  # We skip the Unsorted/Imported Units
+    },
     'product.template': {
-        'fields': ['id', 'name', 'active', 'default_code', 'categ_id/id', 'tracking', 'barcode', 'sale_ok', 'purchase_ok', 'sequence', 'can_be_expensed', 'type', 'invoice_policy', 'purchase_method', 'list_price', 'description', 'description_sale', 'description_purchase', 'responsible_id/id', 'create_uid/id', 'create_date', 'weight', 'volume'],
+        'fields': ['id', 'name', 'active', 'default_code', 'categ_id/id', 'tracking', 'barcode', 'sale_ok', 'purchase_ok', 'sequence', 'can_be_expensed', 'type', 'invoice_policy', 'purchase_method', 'list_price', 'description', 'description_sale', 'description_purchase', 'responsible_id/id', 'create_uid/id', 'create_date', 'weight', 'volume', 'uom_id/id', 'uom_po_id/id'],
         'domain': ['|', ['active', '=', True], ['active', '=', False]],
     },
     'product.product': {
         'fields': ['id', 'name', 'active', 'product_tmpl_id/id']
     },
+    'product.supplierinfo': {
+        'fields': ['id', 'name/id', 'min_qty', 'price', 'delay', 'product_name', 'product_code', 'date_end', 'product_tmpl_id/id', 'product_uom/id'],
+        'domain': [['name', '!=', False], ['name', '!=', '']]
+    },
     'mail.message': {
         'fields': ['id', 'res_id', 'model', 'message_type', 'body', 'subtype_id/id', 'message_id', 'subject', 'date', 'email_from', 'author_id/id', 'record_name', 'partner_ids/id', 'parent_id/id'],
-        'domain': [['model', 'in', ['res.partner', 'crm.lead', 'crm.team', 'crm.stage']]],
+        'domain': [['model', 'in', ['crm.lead', 'crm.team', 'res.partner', 'project.project', 'project.task', 'product.template']]],
     },
     'mail.tracking.value': {
         'fields': ['id', 'field', 'field_desc', 'field_type', 'mail_message_id/id', 'old_value_char', 'old_value_datetime', 'old_value_integer', 'old_value_monetary', 'old_value_float', 'old_value_text', \
