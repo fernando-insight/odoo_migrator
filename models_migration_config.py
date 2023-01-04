@@ -68,15 +68,29 @@ models_migration_config = {
         'domain': ['|', ['active', '=', True], ['active', '=', False]],
     },
     'product.product': {
-        'fields': ['id', 'name', 'active', 'product_tmpl_id/id']
+        'fields': ['id', 'name', 'active', 'product_tmpl_id/id'],
+        'domain': ['|', ['active', '=', True], ['active', '=', False]],
     },
     'product.supplierinfo': {
         'fields': ['id', 'name/id', 'min_qty', 'price', 'delay', 'product_name', 'product_code', 'date_end', 'product_tmpl_id/id', 'product_uom/id'],
         'domain': [['name', '!=', False], ['name', '!=', '']]
     },
+    'purchase.order': {
+        'fields': ['id', 'name', 'origin', 'partner_id/id', 'state', 'partner_ref', 'date_order', 'date_planned', 'date_approve', 'buyer/id', 'invoice_status', 'notes']
+    },
+    'purchase.order.line': {
+        'fields': ['id', 'name', 'partner_id/id', 'state', 'product_id/id', 'order_id/id', 'date_planned', 'product_qty', 'qty_received', 'qty_invoiced', 'product_uom/id', 'price_unit', 'taxes_id/id', 'price_subtotal']
+    },
+    'ir.sequence': {
+        'fields': ['id', 'active', 'name', 'implementation', 'prefix', 'use_date_range', 'padding', 'number_increment'],
+        'domain': ['|', ['active', '=', True], ['active', '=', False], ['code', 'in', ['purchase.order', 'sale.order']]]
+    },
+    'ir.sequence.date_range': {
+        'fields': ['id', 'date_from', 'date_to', 'number_next_actual', 'sequence_id/id']
+    },
     'mail.message': {
         'fields': ['id', 'res_id', 'model', 'message_type', 'body', 'subtype_id/id', 'message_id', 'subject', 'date', 'email_from', 'author_id/id', 'record_name', 'partner_ids/id', 'parent_id/id'],
-        'domain': [['model', 'in', ['crm.lead', 'crm.team', 'res.partner', 'project.project', 'project.task', 'product.template']]],
+        'domain': [['model', 'in', ['crm.lead', 'crm.team', 'res.partner', 'project.project', 'project.task', 'product.template', 'purchase.order']]],
     },
     'mail.tracking.value': {
         'fields': ['id', 'field', 'field_desc', 'field_type', 'mail_message_id/id', 'old_value_char', 'old_value_datetime', 'old_value_integer', 'old_value_monetary', 'old_value_float', 'old_value_text', \
