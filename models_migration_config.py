@@ -81,6 +81,12 @@ models_migration_config = {
     'purchase.order.line': {
         'fields': ['id', 'name', 'partner_id/id', 'state', 'product_id/id', 'order_id/id', 'date_planned', 'product_qty', 'qty_received', 'qty_invoiced', 'product_uom/id', 'price_unit', 'taxes_id/id', 'price_subtotal']
     },
+    'sale.order': {
+        'fields': ['id', 'name', 'origin', 'partner_id/id', 'state', 'partner_shipping_id/id', 'partner_invoice_id/id', 'date_order', 'create_date', 'effective_date', 'confirmation_date', 'commitment_date', 'validity_date', 'team_id/id', 'user_id/id', 'invoice_status', 'note', 'picking_policy', 'amount_total', 'amount_tax', 'amount_untaxed']
+    },
+    'sale.order.line': {
+        'fields': ['id', 'name', 'product_id/id', 'order_id/id', 'product_uom_qty', 'qty_invoiced', 'qty_delivered', 'product_uom/id', 'tax_id/id', 'price_unit', 'price_subtotal', 'price_tax', 'price_total']
+    },
     'ir.sequence': {
         'fields': ['id', 'active', 'name', 'implementation', 'prefix', 'use_date_range', 'padding', 'number_increment'],
         'domain': ['|', ['active', '=', True], ['active', '=', False], ['code', 'in', ['purchase.order', 'sale.order']]]
@@ -90,7 +96,7 @@ models_migration_config = {
     },
     'mail.message': {
         'fields': ['id', 'res_id', 'model', 'message_type', 'body', 'subtype_id/id', 'message_id', 'subject', 'date', 'email_from', 'author_id/id', 'record_name', 'partner_ids/id', 'parent_id/id'],
-        'domain': [['model', 'in', ['crm.lead', 'crm.team', 'res.partner', 'project.project', 'project.task', 'product.template', 'purchase.order']]],
+        'domain': [['model', 'in', ['crm.lead', 'crm.team', 'res.partner', 'project.project', 'project.task', 'product.template', 'purchase.order', 'sale.order', 'sale.order.line']]]
     },
     'mail.tracking.value': {
         'fields': ['id', 'field', 'field_desc', 'field_type', 'mail_message_id/id', 'old_value_char', 'old_value_datetime', 'old_value_integer', 'old_value_monetary', 'old_value_float', 'old_value_text', \
