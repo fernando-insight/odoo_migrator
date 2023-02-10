@@ -4,7 +4,7 @@ models_migration_config = {
         'ignore_fields': ['parent_id/id'],
     },
     'res.partner': {
-        'fields': ['id', 'active', 'name', 'phone', 'email', 'company_type', 'message_bounce', 'type', 'street', 'street2', 'city', 'zip', 'state_id/id', 'country_id/id', 'categ_id/id', 'parent_id/id', 'user_id/id'],
+        'fields': ['id', 'active', 'name', 'phone', 'email', 'customer', 'supplier', 'company_type', 'message_bounce', 'type', 'street', 'street2', 'city', 'zip', 'state_id/id', 'country_id/id', 'categ_id/id', 'parent_id/id', 'user_id/id'],
         'domain': ['|', ['active', '=', True], ['active', '=', False], ['name', '!=', False], ['name', '!=', '']],
         'ignore_fields': ['parent_id/id', 'user_id/id'],
     },
