@@ -1,0 +1,4 @@
+id,name,street,street2,city,zip,state_id/id,country_id/id,company_type
+migration_data.res_partner_national_accounts,National Accounts,531 Lafayette St,,Nashville,37203-4224,base.state_us_43,base.us,company
+migration_data.res_partner_gallery_531,Gallery 531,531 Lafayette St,,Nashville,37203-4224,base.state_us_43,base.us,company
+migration_data.res_partner_kitchen,Kitchen,531 Lafayette St,,Nashville,37203-4224,base.state_us_43,base.us,company

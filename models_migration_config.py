@@ -4,12 +4,14 @@ models_migration_config = {
         'ignore_fields': ['parent_id/id'],
     },
     'res.partner': {
-        'fields': ['id', 'active', 'name', 'phone', 'email', 'customer', 'supplier', 'company_type', 'message_bounce', 'type', 'street', 'street2', 'city', 'zip', 'state_id/id', 'country_id/id', 'categ_id/id', 'parent_id/id', 'user_id/id'],
+        'fields': ['id', 'active', 'name', 'phone', 'email', 'customer', 'supplier', 'company_type', 'message_bounce', 'type', 'street', 'street2', 'city', 'zip', 'state_id/id', 'country_id/id', 'parent_id/id', 'user_id/id'],
         'domain': ['|', ['active', '=', True], ['active', '=', False], ['name', '!=', False], ['name', '!=', '']],
         'ignore_fields': ['parent_id/id', 'user_id/id'],
     },
+    'res.company': {
+    },
     'res.users': {
-        'fields': ['id', 'active', 'login', 'email', 'name', 'partner_id/id', 'login_date', 'lang', 'tz', 'notification_type'],
+        'fields': ['id', 'active', 'login', 'email', 'name', 'partner_id/id', 'login_date', 'lang', 'tz', 'notification_type', 'branch_id/id', 'allow_branch_ids/id'],
         'domain': ['|', ['active', '=', True], ['active', '=', False], ['id', '>', 5]], # Skip Odoo's default users
     },
     'crm.lead.tag': {
@@ -32,7 +34,7 @@ models_migration_config = {
         'fields': ['id', 'name']
     },
     'project.project': {
-        'fields': ['id', 'active', 'name', 'color', 'user_id/id', 'sequence', 'privacy_visibility', 'partner_id/id', 'label_tasks', 'alias_name', 'alias_contact', 'resource_calendar_id/id'],
+        'fields': ['id', 'active', 'name', 'color', 'user_id/id', 'sequence', 'privacy_visibility', 'partner_id/id', 'label_tasks', 'alias_name', 'alias_contact', 'resource_calendar_id/id', 'branch_id/id'],
         'workers': 1,
         'domain': ['|', ['active', '=', True], ['active', '=', False]],
     },

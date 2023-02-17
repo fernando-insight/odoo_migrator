@@ -1,0 +1,4 @@
+id,name,partner_id/id
+base.main_company,National Accounts,migration_data.res_partner_national_accounts
+migration_data.res_company_gallery_531,Gallery 531,migration_data.res_partner_gallery_531
+migration_data.res_company_kitchen,Kitchen,migration_data.res_partner_kitchen
