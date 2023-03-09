@@ -3,6 +3,8 @@ models_migration_config = {
         'fields': ['id', 'active', 'color', 'create_date', 'write_date', 'name', 'parent_id/id',],
         'ignore_fields': ['parent_id/id'],
     },
+    'account.payment.term': {
+    },
     'res.partner': {
         'fields': ['id', 'active', 'name', 'phone', 'email', 'customer', 'supplier', 'company_type', 'message_bounce', 'type', 'street', 'street2', 'city', 'zip', 'state_id/id', 'country_id/id', 'categ_id/id', 'parent_id/id', 'user_id/id'],
         'domain': ['|', ['active', '=', True], ['active', '=', False], ['name', '!=', False], ['name', '!=', '']],

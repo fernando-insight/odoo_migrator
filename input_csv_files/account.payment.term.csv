@@ -1,0 +1,24 @@
+id,name,discount_days,payment_term_for,line_ids/id,line_ids/day_of_the_month,line_ids/days,line_ids/option,line_ids/sequence,line_ids/value,line_ids/value_amount
+i5_migration.account_payment_term_joint_check,Joint Check,0,Customer,i5_migration.account.payment.term.line.1,0,30,days after the invoice date,1,Balance,0
+i5_migration.account_payment_term_cod,C.O.D. [Collect On Delivery],0,Customer,i5_migration.account.payment.term.line.2,0,0,days after the invoice date,2,Balance,0
+i5_migration.account_payment_term_2percent10daysnet30days,2% 10Days NET 30Days,10,Customer,i5_migration.account.payment.term.line.3,0,30,days after the invoice date,3,Balance,0
+i5_migration.account_payment_term_1percent10daysnet30days,1% 10Days NET 30Days,10,Supplier,i5_migration.account.payment.term.line.4,0,30,days after the invoice date,4,Balance,0
+i5_migration.account_payment_term_net1stprox,NET 1ST Prox,0,Supplier,i5_migration.account.payment.term.line.5,0,1,days after the end of the invoice month,5,Balance,0
+i5_migration.account_payment_term_1percent20days,1% 20Days,20,Customer,i5_migration.account.payment.term.line.6,0,30,days after the invoice date,6,Balance,0
+i5_migration.account_payment_term_0_5percent10days,0.5% 10Days,10,Supplier,i5_migration.account.payment.term.line.7,0,30,days after the invoice date,7,Balance,0
+i5_migration.account_payment_term_0_65percent10days,0.65% 10Days,10,Supplier,i5_migration.account.payment.term.line.8,0,30,days after the invoice date,8,Balance,0
+i5_migration.account_payment_term_2percent10th,2%10TH,0,Supplier,i5_migration.account.payment.term.line.9,0,0,days after the invoice date,9,Balance,0
+i5_migration.account_payment_term_1percent10th,1%10TH,0,Supplier,i5_migration.account.payment.term.line.10,0,0,days after the invoice date,10,Balance,0
+i5_migration.account_payment_term_1_525th,1.525TH,0,Supplier,i5_migration.account.payment.term.line.11,0,0,days after the invoice date,11,Balance,0
+i5_migration.account_payment_term_2percent10thagain,2% 10TH,0,Supplier,i5_migration.account.payment.term.line.12,0,0,days after the invoice date,12,Balance,0
+i5_migration.account_payment_term_net25th,NET 25TH,0,Supplier,i5_migration.account.payment.term.line.13,0,0,days after the invoice date,13,Balance,0
+i5_migration.account_payment_term_2percent10thproxnet30days,2% 10TH Prox NET 30Days,10,Customer,i5_migration.account.payment.term.line.14,0,30,days after the invoice date,14,Balance,0
+i5_migration.account_payment_term_on_rec,ON REC,0,Supplier,i5_migration.account.payment.term.line.15,0,0,days after the invoice date,15,Balance,0
+i5_migration.account_payment_term_1_5percent25thprox,1.5% 25TH Prox,25,Supplier,i5_migration.account.payment.term.line.16,0,0,days after the invoice date,16,Balance,0
+i5_migration.account_payment_term_net7days,NET 7Days,0,Supplier,i5_migration.account.payment.term.line.17,0,7,days after the invoice date,17,Balance,0
+i5_migration.account_payment_term_net10days,NET 10Days,10,Customer,i5_migration.account.payment.term.line.18,0,10,days after the invoice date,18,Balance,0
+i5_migration.account_payment_term_net45days,NET 45Days,45,Customer,i5_migration.account.payment.term.line.19,0,45,days after the invoice date,19,Balance,0
+i5_migration.account_payment_term_net60days,NET 60Days,60,Customer,i5_migration.account.payment.term.line.20,0,60,days after the invoice date,20,Balance,0
+i5_migration.account_payment_term_net30days,NET 30Days,30,Customer,i5_migration.account.payment.term.line.21,0,30,days after the invoice date,21,Balance,0
+i5_migration.account_payment_term_net40days,NET 40Days,30,Customer,i5_migration.account.payment.term.line.22,0,40,days after the invoice date,22,Balance,0
+i5_migration.account_payment_term_net90days,NET 90Days,0,Supplier,i5_migration.account.payment.term.line.23,0,90,days after the invoice date,23,Balance,0
