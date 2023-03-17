@@ -6,7 +6,7 @@ models_migration_config = {
     'account.payment.term': {
     },
     'res.partner': {
-        'fields': ['id', 'active', 'name', 'phone', 'email', 'customer', 'supplier', 'company_type', 'message_bounce', 'type', 'street', 'street2', 'city', 'zip', 'state_id/id', 'country_id/id', 'categ_id/id', 'parent_id/id', 'user_id/id'],
+        'fields': ['id', 'active', 'name', 'phone', 'email', 'customer', 'supplier', 'company_type', 'message_bounce', 'type', 'street', 'street2', 'city', 'zip', 'state_id/id', 'country_id/id', 'categ_id/id', 'parent_id/id', 'user_id/id', 'property_supplier_payment_term_id/name'],
         'domain': ['|', ['active', '=', True], ['active', '=', False], ['name', '!=', False], ['name', '!=', '']],
         'ignore_fields': ['parent_id/id', 'user_id/id'],
     },
@@ -107,4 +107,5 @@ models_migration_config = {
     'ir.attachment': {
         'fields': ['id', 'name', 'description', 'type', 'mimetype', 'create_uid/id', 'index_content', 'public', 'res_name', 'res_model', 'res_id']
     },
+    'stock.location': {}
 }
