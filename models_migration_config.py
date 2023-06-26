@@ -89,6 +89,22 @@ models_migration_config = {
     'sale.order.line': {
         'fields': ['id', 'name', 'product_id/id', 'order_id/id', 'product_uom_qty', 'qty_invoiced', 'qty_delivered', 'product_uom/id', 'tax_id/id', 'price_unit', 'price_subtotal', 'price_tax', 'price_total']
     },
+    'mail.mass_mailing.contact': {
+        'fields': ['id', 'name', 'email', 'company_name', 'message_bounce', 'country_id/id', 'create_date', 'create_uid/id', '__last_update', 'write_uid/id', 'write_date'],
+    },
+    'mail.mass_mailing.list': {
+        'fields': ['id', 'name', 'active']
+    },
+    'mail.mass_mailing': {
+        'fields': ['id', 'name', 'active', 'email_from', 'source_id/id', 'mailing_model_id/id', 'reply_to', 'schedule_date', 'sent_date', 'contact_list_ids/id', 'body_html']
+    },
+    'mailing.contact.subscription': {
+    },
+    'mailing.mailing': {
+    },
+    'utm.source': {
+        'fields': ['id', 'name']
+    },
     'ir.sequence': {
         'fields': ['id', 'active', 'name', 'implementation', 'prefix', 'use_date_range', 'padding', 'number_increment'],
         'domain': ['|', ['active', '=', True], ['active', '=', False], ['code', 'in', ['purchase.order', 'sale.order']]]

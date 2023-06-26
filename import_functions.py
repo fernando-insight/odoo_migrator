@@ -33,6 +33,12 @@ def import_data(model_name = None, file_csv = None, context = None, separator = 
 
     if model_name == 'crm.lead.tag':
         model_name = 'crm.tag'
+    if model_name == 'mail.mass_mailing.contact':
+        model_name = 'mailing.contact'
+    if model_name == 'mail.mass_mailing.list':
+        model_name = 'mailing.list'
+    if model_name == 'mail.mass_mailing':
+        model_name = 'mailing.mailing'
 
     import_threaded.import_data(
         IMPORT_CONNECTION_CONFIG_DIR,
