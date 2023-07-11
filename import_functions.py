@@ -39,6 +39,8 @@ def import_data(model_name = None, file_csv = None, context = None, separator = 
         model_name = 'mailing.list'
     if model_name == 'mail.mass_mailing':
         model_name = 'mailing.mailing'
+    if model_name == 'mass.mailing.template':
+        model_name = 'mailing.template'
 
     import_threaded.import_data(
         IMPORT_CONNECTION_CONFIG_DIR,
@@ -60,4 +62,4 @@ def import_ignored_fields(model_name, fields = None, file_csv = None,  ignore_fi
     if ignore_fields:
         # import the ignored fields
         added_fields = list(f for f in fields if f not in ignore_fields and f not in ['id'])
-        import_data(model_name, file_csv=file_csv, ignore_fields=added_fields, group_by = group_by, workers = workers)
+        import_data(model_name, file_csv=file_csv, ignore_fields=added_fields, group_by = group_by, workers = workers, batch_size=500)

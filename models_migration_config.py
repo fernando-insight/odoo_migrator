@@ -7,7 +7,7 @@ models_migration_config = {
     },
     'res.partner': {
         'fields': ['id', 'active', 'name', 'phone', 'email', 'customer', 'supplier', 'company_type', 'message_bounce', 'type', 'street', 'street2', 'city', 'zip', 'state_id/id', 'country_id/id', 'categ_id/id', 'parent_id/id', 'user_id/id', 'hesco_account_number', 'hesco_account_open_date'],
-        'domain': ['|', ['active', '=', True], ['active', '=', False], ['name', '!=', False], ['name', '!=', '']],
+        'domain': ['|', ['active', '=', True], ['active', '=', False], ['name', '!=', False], ['name', '!=', ''], ['customer', '=', True]],
         'ignore_fields': ['parent_id/id', 'user_id/id'],
     },
     'res.users': {
@@ -18,14 +18,14 @@ models_migration_config = {
         'fields': ['id', 'color', 'name']
     },
     'crm.stage': {
-        'fields': ['id', 'fold', 'sequence', 'name'],
+        'fields': ['id', 'fold', 'company_division_id/id', 'sequence', 'name'],
     },
     'crm.team': {
-        'fields': ['id', 'name', 'active', 'user_id/id', 'alias_name', 'use_quotations', 'use_opportunities', 'use_leads', 'alias_contact', 'invoiced_target'],
+        'fields': ['id', 'name', 'active', 'branch_id/id', 'user_id/id', 'alias_name', 'use_quotations', 'use_opportunities', 'use_leads', 'alias_contact', 'invoiced_target'],
         'domain': ['|', ['active', '=', True], ['active', '=', False]],
     },
     'crm.lead': {
-        'fields': ['id', 'active', 'name', 'description', 'type', 'date_open', 'date_closed', 'message_bounce', 'priority', 'planned_revenue', 'probability', 'date_deadline', 'partner_name', 'street', 'street2', 'city', 'state_id/id', 'zip', 'country_id/id', 'website', 'partner_id/id', 'user_id/id', 'stage_id/id', 'team_id/id', 'tag_ids/id'],
+        'fields': ['id', 'active', 'name', 'branch_id/id', 'description', 'type', 'date_open', 'date_closed', 'message_bounce', 'priority', 'planned_revenue', 'probability', 'date_deadline', 'partner_name', 'street', 'street2', 'city', 'state_id/id', 'zip', 'country_id/id', 'website', 'partner_id/id', 'user_id/id', 'stage_id/id', 'team_id/id', 'tag_ids/id'],
         'domain': ['|', ['active', '=', True], ['active', '=', False]],
         'group_by': 'stage_id/id',
         'workers': 1
@@ -34,7 +34,7 @@ models_migration_config = {
         'fields': ['id', 'name']
     },
     'project.project': {
-        'fields': ['id', 'active', 'name', 'color', 'user_id/id', 'sequence', 'privacy_visibility', 'partner_id/id', 'label_tasks', 'alias_name', 'alias_contact', 'resource_calendar_id/id'],
+        'fields': ['id', 'active', 'name', 'color', 'branch_id/id', 'user_id/id', 'sequence', 'privacy_visibility', 'partner_id/id', 'label_tasks', 'alias_name', 'alias_contact', 'resource_calendar_id/id'],
         'workers': 1,
         'domain': ['|', ['active', '=', True], ['active', '=', False]],
     },
@@ -44,7 +44,7 @@ models_migration_config = {
     'project.task': {
         'fields': ['id', 'active', 'name', 'priority', 'description', 'color', 'stage_id/id', 'email_from', 'project_id/id', 'user_id/id', 'date_deadline', 'tag_ids/id', 'planned_hours', 'sequence', 'partner_id/id', 'date_assign', 'date_last_stage_update', 'parent_id/id'],
         'ignore_fields': ['parent_id/id'],
-        'domain': ['|', ['active', '=', True], ['active', '=', False]],
+        'domain': ['|', ['active', '=', True], ['active', '=', False], ['name', '!=', False], ['name', '!=', '']],
         'workers': 1
     },
     'product.category': {
@@ -105,6 +105,9 @@ models_migration_config = {
     'utm.source': {
         'fields': ['id', 'name']
     },
+    'mass.mailing.template': {
+        'fields': ['id', 'name', 'active', 'body_html']
+    },
     'ir.sequence': {
         'fields': ['id', 'active', 'name', 'implementation', 'prefix', 'use_date_range', 'padding', 'number_increment'],
         'domain': ['|', ['active', '=', True], ['active', '=', False], ['code', 'in', ['purchase.order', 'sale.order']]]
@@ -122,6 +125,9 @@ models_migration_config = {
     },
     'ir.attachment': {
         'fields': ['id', 'name', 'description', 'type', 'mimetype', 'create_uid/id', 'index_content', 'public', 'res_name', 'res_model', 'res_id']
+    },
+    'mail.activity': {
+        'fields': ['id', 'res_id', 'res_model', 'res_name', 'res_model_id/id', 'activity_type_id/id', 'previous_activity_type_id/id', 'recommended_activity_type_id/id', 'activity_category', 'state', 'summary', 'note', 'date_deadline', 'user_id/id', 'date_done', 'icon', 'create_uid/id', 'create_date', 'write_uid/id', 'write_date', '__last_update'],
     },
     'stock.location': {}
 }
