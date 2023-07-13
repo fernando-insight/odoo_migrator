@@ -126,8 +126,11 @@ models_migration_config = {
     'ir.attachment': {
         'fields': ['id', 'name', 'description', 'type', 'mimetype', 'create_uid/id', 'index_content', 'public', 'res_name', 'res_model', 'res_id']
     },
+    'mail.activity.type': {
+        'fields': ['id', 'days', 'category', 'icon', 'name', 'sequence', 'summary']
+    },
     'mail.activity': {
-        'fields': ['id', 'res_id', 'res_model', 'res_name', 'res_model_id/id', 'activity_type_id/id', 'previous_activity_type_id/id', 'recommended_activity_type_id/id', 'activity_category', 'state', 'summary', 'note', 'date_deadline', 'user_id/id', 'date_done', 'icon', 'create_uid/id', 'create_date', 'write_uid/id', 'write_date', '__last_update'],
+        'fields': ['id', 'res_id', 'res_model', 'res_name', 'res_model_id/id', 'activity_type_id/id', 'previous_activity_type_id/id', 'recommended_activity_type_id/id', 'activity_category', 'state', 'summary', 'note', 'date_deadline', 'user_id/id', 'icon', 'create_uid/id', 'create_date', 'write_uid/id', 'write_date', '__last_update'],
     },
     'stock.location': {}
 }
