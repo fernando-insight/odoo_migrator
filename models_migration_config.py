@@ -102,6 +102,12 @@ models_migration_config = {
     },
     'mailing.mailing': {
     },
+    'mailing.list': {
+    },
+    'mailing.contact': {
+    },
+    'mailing.template': {
+    },
     'utm.source': {
         'fields': ['id', 'name']
     },
